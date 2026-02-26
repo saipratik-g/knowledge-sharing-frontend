@@ -1,70 +1,149 @@
-# Getting Started with Create React App
+# Knowledge Sharing Platform — Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, responsive React frontend for a knowledge-sharing platform. Users can read, search, and filter articles, create and publish their own, and manage their content via a personal dashboard.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 1️⃣ Approach
 
-### `npm start`
+### Architecture Overview
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The frontend is a **single-page application (SPA)** built with **React 19** and styled with **Tailwind CSS**. It communicates with the backend via **Axios**, using a centralized API client with JWT injection interceptors.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```
+App.js (BrowserRouter)
+    ├── Public Routes (no auth required)
+    │       ├── /login          → Login page
+    │       ├── /signup         → Signup page
+    │       ├── /              → Home (article list + search/filter)
+    │       └── /articles/:id   → Article detail view
+    └── Protected Routes (JWT required)
+            ├── /create         → Create / Edit article
+            └── /dashboard      → My articles dashboard
+```
 
-### `npm test`
+- **`api.js`** — Centralized Axios instance with `baseURL`, JWT request interceptor, and 401 response interceptor (auto-logout)
+- **`App.js`** — Route definitions with `PrivateRoute` guard using `localStorage` JWT check
+- **Pages** — Full-page components (Home, Login, Signup, ArticleDetail, CreateArticle, Dashboard)
+- **Components** — Shared UI components (Navbar)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Folder Structure
 
-### `npm run build`
+```
+knowledge-sharing-frontend/
+├── public/                   # Static assets
+├── src/
+│   ├── api.js                # Axios instance + interceptors
+│   ├── App.js                # Routing + layout structure
+│   ├── index.js              # React root entry point
+│   ├── index.css             # Tailwind directives + custom utilities
+│   ├── components/
+│   │   └── Navbar.js         # Top navigation bar
+│   └── pages/
+│       ├── Home.js           # Article feed with search & category filter
+│       ├── Login.js          # Login form with JWT storage
+│       ├── Signup.js         # Registration form with password strength
+│       ├── ArticleDetail.js  # Full article view with author actions
+│       ├── CreateArticle.js  # Rich text editor (react-quill-new) + AI improve
+│       └── Dashboard.js      # User's own articles with edit/delete
+├── .env                      # Environment variables
+├── tailwind.config.js        # Tailwind configuration
+└── package.json
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Key Design Decisions
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- **React 19 + react-quill-new** — The standard `react-quill` uses `ReactDOM.findDOMNode` which was removed in React 18+. We use `react-quill-new`, a maintained fork compatible with React 18/19
+- **Centralized Axios client** — `api.js` auto-attaches JWT headers to every request and globally handles 401 by clearing localStorage and redirecting to `/login`
+- **PrivateRoute pattern** — Protected pages check for JWT token in `localStorage` and redirect to `/login` if absent
+- **Tailwind CSS** — Utility-first styling for rapid UI development with custom brand color tokens defined in `tailwind.config.js`
+- **Tags stored as strings** — Backend stores tags as comma-separated strings; frontend splits them on render for display
+- **Field mapping** — Frontend form fields (`body`, `summary`) are explicitly mapped to backend expectations (`content`, `shortSummary`) in the submit payload
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## 2️⃣ AI Usage
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Tools Used
+- **Antigravity (Google DeepMind AI Coding Assistant)** — primary tool used for UI generation, component structure, debugging, and fixing compatibility issues
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Where AI Helped
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+| Area | What AI Did |
+|------|-------------|
+| **Code generation** | Generated all page components (Home, Login, Signup, Dashboard, CreateArticle, ArticleDetail) with full JSX, state management, and API wiring |
+| **UI ideas** | Suggested modern card-based layouts, password strength indicator, category color chips, and responsive grid for article feed |
+| **Refactoring** | Fixed field name mismatches between frontend form state and backend API expectations across all pages |
+| **API design** | Designed the Axios interceptor pattern for JWT injection and auto-logout on 401 |
+| **Debugging** | Diagnosed and fixed 10 bugs including base URL mismatch, React 19 incompatibility, tags `.map()` crash, and raw HTML entity display |
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### What Was Reviewed / Corrected Manually
 
-## Learn More
+- Validated route guard logic for protected pages using JWT presence check
+- Reviewed Quill editor configuration (toolbar modules, theme, placeholder)
+- Verified form validation (password length check, required fields before submit)
+- Confirmed correct field mapping in article submit payload (`body` → `content`, `summary` → `shortSummary`)
+- Tested tag search filter to handle both string and array formats from the API
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+> **Example:** "Used AI to generate rich text editor integration and dashboard UI, then manually corrected field name mismatches between frontend form state and backend API contracts, and fixed `react-quill` React 19 incompatibility by switching to `react-quill-new`."
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 3️⃣ Setup Instructions
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Prerequisites
 
-### Analyzing the Bundle Size
+- **Node.js** v18+ ([download](https://nodejs.org))
+- **npm** (comes with Node.js)
+- Backend server running at `http://localhost:5000` (see backend README)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Environment Variables
 
-### Making a Progressive Web App
+Create a `.env` file in the project root:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```env
+REACT_APP_API_URL=http://localhost:5000/api
+```
 
-### Advanced Configuration
+> ⚠️ The `/api` prefix is required — all backend routes are prefixed with `/api`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Frontend Setup
 
-### Deployment
+```bash
+# 1. Clone the repo / navigate to folder
+cd knowledge-sharing-frontend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+# 2. Install dependencies
+npm install
 
-### `npm run build` fails to minify
+# 3. Create .env file (see above)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# 4. Start the development server
+npm start
+```
+
+The app opens automatically at **http://localhost:3000**
+
+### Pages & Features
+
+| Route | Access | Description |
+|-------|--------|-------------|
+| `/` | Public | Article feed with live search and category filter |
+| `/login` | Public | Login with email + password |
+| `/signup` | Public | Register with username, email + password strength meter |
+| `/articles/:id` | Public | Full article detail view with rich HTML content |
+| `/create` | 🔒 Auth | Create or edit article with rich text editor + AI improve button |
+| `/dashboard` | 🔒 Auth | View, edit, delete your own articles |
+
+> 🔒 = Requires login. Unauthenticated users are redirected to `/login`.
+
+### Tech Stack
+
+| Library | Version | Purpose |
+|---------|---------|---------|
+| React | 19.2.4 | UI framework |
+| react-router-dom | 7.x | Client-side routing |
+| axios | 1.x | HTTP client |
+| react-quill-new | latest | Rich text editor (React 18/19 compatible) |
+| Tailwind CSS | 3.x | Utility-first styling |
+| lucide-react | latest | Icon library |
