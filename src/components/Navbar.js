@@ -68,8 +68,8 @@ export default function Navbar() {
                                 key={to}
                                 to={to}
                                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${isActive(to)
-                                        ? 'bg-brand-50 text-brand-700'
-                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                    ? 'bg-brand-50 text-brand-700'
+                                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                                     }`}
                             >
                                 {icon}
@@ -87,7 +87,7 @@ export default function Navbar() {
                                         <User size={12} className="text-brand-700" />
                                     </div>
                                     <span className="text-sm font-medium text-slate-700 max-w-[120px] truncate">
-                                        {user.name || user.email}
+                                        {user.username || user.email}
                                     </span>
                                 </div>
                                 <button onClick={handleLogout} className="btn-secondary !py-1.5">
@@ -128,8 +128,8 @@ export default function Navbar() {
                             to={to}
                             onClick={() => setMobileOpen(false)}
                             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive(to)
-                                    ? 'bg-brand-50 text-brand-700'
-                                    : 'text-slate-600 hover:bg-slate-50'
+                                ? 'bg-brand-50 text-brand-700'
+                                : 'text-slate-600 hover:bg-slate-50'
                                 }`}
                         >
                             {icon}
@@ -139,7 +139,7 @@ export default function Navbar() {
                     <div className="pt-2 border-t border-slate-100">
                         {user ? (
                             <div className="flex items-center justify-between">
-                                <span className="text-sm font-medium text-slate-700">{user.name || user.email}</span>
+                                <span className="text-sm font-medium text-slate-700">{user.username || user.email}</span>
                                 <button onClick={handleLogout} className="btn-secondary !py-1.5 !text-sm">
                                     <LogOut size={14} /> Logout
                                 </button>

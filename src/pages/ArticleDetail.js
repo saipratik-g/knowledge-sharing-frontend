@@ -69,11 +69,7 @@ export default function ArticleDetail() {
 
     const authorName = article.author?.username || article.author?.name || article.authorName || 'Anonymous';
     const catColor = CATEGORY_COLORS[article.category] || 'bg-slate-100 text-slate-600';
-    const isOwner =
-        currentUser &&
-        (currentUser._id === article.author?._id ||
-            currentUser.id === article.author?.id ||
-            currentUser._id === article.authorId);
+    const isOwner = currentUser && (currentUser.id === article.userId);
 
     return (
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
